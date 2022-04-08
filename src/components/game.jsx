@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 
+/**
+ * Class to render game buttons 
+ */
 class Game extends Component {
   render() {
     const { onRestart } = this.props;
@@ -13,8 +16,6 @@ class Game extends Component {
       </div>
     );
   }
-
-
 }
 
 export default Game;

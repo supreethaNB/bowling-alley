@@ -3,20 +3,22 @@ import ScoreCard from "./components/scorecard";
 import Frame from "./components/frame";
 import Game from "./components/game";
 
-
-
+/**
+ * Class to drive the game
+ */
 class App extends Component {
   constructor(props) {
     super(props);
-
+    this.maxFrames = 10;
+    this.maxFramePins = 10;
     this.frameIntialValue = {
       firstRoll: 0,
       secondRoll: 0,
       firstRollDisabled: false,
       secondRollDisabled: true,
-      secondRollMaxRange: 10,
+      secondRollMaxRange: this.maxFramePins,
     }
-
+    // React states variables
     this.state = {
       finalScore: 0,
       frameCounter: 1,
@@ -39,15 +41,16 @@ class App extends Component {
       STRIKE: 2
     });
 
-    this.maxFrames = 10;
-    this.maxFramePins = 10;
-
     this.handleFrameSubmit = this.handleFrameSubmit.bind(this);
     this.handleReset = this.handleReset.bind(this);
     this.updatePreviousScore = this.updatePreviousScore.bind(this);
     this.handleFirstRoll = this.handleFirstRoll.bind(this);
   }
 
+  /**
+   * Function to handle submit of frame. Updates state variables and manages the frame.
+   * @param {Event} click event
+   */
   handleFrameSubmit = (event) => {
     event.preventDefault();
     let firstRoll = parseInt(this.state.frameValue.firstRoll);
@@ -64,17 +67,16 @@ class App extends Component {
     };
     if (this.state.frameCounter <= this.maxFrames) {
 
-      let frameInfo = this.frameState.NA;
+      frameScore.info = this.frameState.NA;
       let extraBallCount = 0;
       if (firstRoll === this.maxFramePins) {
-        frameInfo = this.frameState.STRIKE;
+        frameScore.info = this.frameState.STRIKE;
         extraBallCount = isLastFrame ? this.lastFrameExtras.STRIKE : 0;
       } else if (frameTotal === this.maxFramePins) {
-        frameInfo = this.frameState.SPARE;
+        frameScore.info = this.frameState.SPARE;
         extraBallCount = isLastFrame ? this.lastFrameExtras.SPARE : 0;
       }
-      frameScore.info = frameInfo;
-      let gameOver = (this.state.frameCounter === this.maxFrames && extraBallCount === 0) ? true : false;
+      let gameOver = (isLastFrame && extraBallCount === 0) ? true : false;
 
       if (this.state.frameCounter > 1) {
         this.updatePreviousScore(frameScore, extraBallCount, gameOver);
@@ -92,6 +94,12 @@ class App extends Component {
     }
   };
 
+  /**
+   * Function to update previous frames in case of current frame strike/spare
+   * @param {Object} frameScore 
+   * @param {Number} extraBallCount - On last ball strike value is 2, on spare value is 1
+   * @param {gameOver} Info that game is completed
+   */
   updatePreviousScore = (frameScore, extraBallCount, gameOver) => {
     let finalScore = this.state.finalScore;
     let previousScoreIndex = this.state.frameScores.length - 1;
@@ -131,17 +139,26 @@ class App extends Component {
 
   };
 
+   /**
+   * Function to handle first roll. Contols the second roll pins and register the first roll score.
+   * @param {Event} click event 
+   */
   handleFirstRoll = (event) => {
     let firstRoll = event.target.value;
     const rollVal = {
       ...this.state.frameValue,
       firstRoll: parseInt(firstRoll),
-      secondRollDisabled: ((this.state.extraBallCount === 0 && firstRoll < 10) || (this.state.extraBallCount === 2)) ? false : true,
-      secondRollMaxRange: (this.state.extraBallCount === 0) ? 10 - parseInt(firstRoll) : 10
+      secondRollDisabled: ((this.state.extraBallCount === 0 && firstRoll < this.maxFramePins) ||
+       (this.state.extraBallCount === this.lastFrameExtras.STRIKE)) ? false : true,
+      secondRollMaxRange: (this.state.extraBallCount === 0) ? this.maxFramePins - parseInt(firstRoll) : this.maxFramePins
     };
     this.setState({ frameValue: rollVal });
   };
 
+  /**
+   * Function to handle second roll. Register the second roll score
+   * @param {Event} click event 
+   */
   handleSecondRoll = (event) => {
     const rollVal = {
       ...this.state.frameValue,
@@ -151,10 +168,16 @@ class App extends Component {
     this.setState({ frameValue: rollVal });
   };
 
+  /**
+   * Function to handle restart of the game
+   */
   handleRestart = () => {
     window.location.reload();
   };
 
+  /**
+   * Function to handle reset of the frame
+   */
   handleReset = (event) => {
     event.preventDefault();
     this.setState((prevState) => ({
@@ -163,14 +186,17 @@ class App extends Component {
     }));
   };
 
+  /**
+   * Buit in Function to render HTML content 
+   */
   render() {
     return (
       <div className="main__wrap">
         <main className="container">
           <div className="card__box">
-           <Game
-           onRestart={this.handleRestart}
-           />
+            <Game
+              onRestart={this.handleRestart}
+            />
             <ScoreCard
               totalScore={this.state.finalScore}
               frameScores={this.state.frameScores}
@@ -187,7 +213,7 @@ class App extends Component {
                   onFirstRoll={this.handleFirstRoll}
                   onSecondRoll={this.handleSecondRoll}
                 />
-                ) :
+              ) :
                 (<span className="game-over">
                   Game Over! Your score is {this.state.finalScore}
                 </span>)

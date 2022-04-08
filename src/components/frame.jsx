@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 
+/**
+ * Class to render Frames of the game
+ */
 class Frame extends Component {
 
   render() {
@@ -27,16 +30,15 @@ class Frame extends Component {
             />
           </div>
           <button className="btn btn-success m-2">
-            Submit frame #{frameCounter}
-            <i className="fa fa-check" aria-hidden="true" />
+          <i className="fa fa-check" aria-hidden="true" />
+           &nbsp; Submit frame #{frameCounter}
           </button>
           <button className="btn btn-success m-2" 
-            onClick={onReset}> Reset
+            onClick={onReset}> 
             <i className="fa fa-refresh" aria-hidden="true" />
+            &nbsp; Reset
           </button>
         </form>
-
-        
       </div>
     );
   }

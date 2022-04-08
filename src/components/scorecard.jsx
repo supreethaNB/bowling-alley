@@ -1,12 +1,13 @@
 import React from "react";
 
-// Stateless Functional Component
+/**
+ * Class to render Score card of the game
+ */ 
 
 const ScoreCard = ({ totalScore, frameScores }) => {
   let frameCounter = 1;
   const frameScoreList = frameScores.map((frameScore) =>
-    <li>Frame {frameCounter++} --- {frameScore.firstRoll} | {frameScore.secondRoll} 
-       -- {frameScore.frameTotal}
+    <li>Frame {frameCounter++} ---( {frameScore.firstRoll} | {frameScore.secondRoll} )-- {frameScore.frameTotal}
     </li>
   );
 
